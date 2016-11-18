@@ -51,7 +51,7 @@ class Activity(object):
         for tp in trackpoints:
             self.lat = np.append(self.lat, float(tp.attrs['lat']))
             self.lon = np.append(self.lon, float(tp.attrs['lon']))
-            self.ele = np.append(self.ele, float(tp.contents[1].text))
+            # self.ele = np.append(self.ele, float(tp.contents[1].text))
             self.temp = np.append(self.temp,
                             float(tp.contents[5].contents[1].contents[1].text))
 
@@ -64,10 +64,13 @@ class Activity(object):
         for tp in trackpoints:
             time = datetime.strptime(tp.find('Time').text, '%Y-%m-%dT%H:%M:%S.%fZ') + offset
             self.time = np.append(self.time, time)
+            self.ele = np.append(self.ele, float(tp.find('AltitudeMeters').text))
             self.dist = np.append(self.dist, float(tp.find('DistanceMeters').text))
-            # self.ele = np.append(self.ele, float(tp.find('AltitudeMeters').text))
             self.cad = np.append(self.cad, int(tp.find('Cadence').text))
-            self.hr = np.append(self.hr, int(tp.find('HeartRateBpm').text))
+            if tp.find('HeartRateBpm') == None:
+                self.hr = np.append(self.hr, self.hr[-1])
+            else:
+                self.hr = np.append(self.hr, int(tp.find('HeartRateBpm').text))
             self.spd = np.append(self.spd, float(tp.find('Speed').text))
             self.pwr = np.append(self.pwr, int(tp.find('Watts').text))
 
